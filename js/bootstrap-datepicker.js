@@ -921,7 +921,8 @@
 			var classes, tooltip, before;
 			for (var currVal = startVal - step; currVal <= endVal + step; currVal += step) {
 				classes = [cssClass];
-				tooltip = null;
+                tooltip = null;
+                dataAttributes = null;
 
 				if (currVal === startVal - step) {
 					classes.push('old');
@@ -935,8 +936,8 @@
 					classes.push('disabled');
 				}
 				if (currVal === focusedVal) {
-				  classes.push('focused');
-        }
+                  classes.push('focused');
+                }
 
 				if (beforeFn !== $.noop) {
 					before = beforeFn(new Date(currVal, 0, 1));
@@ -955,10 +956,12 @@
 					}
 					if (before.tooltip) {
 						tooltip = before.tooltip;
-					}
+                    }
+                    
+                    
 				}
 
-				html += '<span class="' + classes.join(' ') + '"' + (tooltip ? ' title="' + tooltip + '"' : '') + '>' + currVal + '</span>';
+				html += '<span class="' + classes.join(' ') + '"' + (tooltip ? ' title="' + tooltip + '"' : '') + (dataAttributes || '') + '>' + currVal + '</span>';
 			}
 
 			view.find('.datepicker-switch').text(startVal + '-' + endVal);
@@ -1027,6 +1030,7 @@
 				clsName.push('day');
 
 				var content = prevMonth.getUTCDate();
+                var dataAttributes = null;
 
 				if (this.o.beforeShowDay !== $.noop){
 					before = this.o.beforeShowDay(this._utc_to_local(prevMonth));
@@ -1043,7 +1047,9 @@
 					if (before.tooltip)
 						tooltip = before.tooltip;
 					if (before.content)
-						content = before.content;
+                        content = before.content;
+                    if(before.dataAttributes && before.dataAttributes.length > 0)
+                        dataAttributes = before.dataAttributes.map(function (t) { for (var e in t) return "data-" + e + '="' + t[e] + '"' }).join(" ");
 				}
 
 				//Check if uniqueSort exists (supported by jquery >=1.12 and >=2.2)
@@ -1054,7 +1060,7 @@
 					clsName = $.unique(clsName);
 				}
 
-				html.push('<td class="'+clsName.join(' ')+'"' + (tooltip ? ' title="'+tooltip+'"' : '') + ' data-date="' + prevMonth.getTime().toString() + '">' + content + '</td>');
+				html.push('<td class="'+clsName.join(' ')+'"' + (tooltip ? ' title="'+tooltip+'"' : '') + ' data-date="' + prevMonth.getTime().toString() + '" '+ (dataAttributes || '')  +'>' + content + '</td>');
 				tooltip = null;
 				if (weekDay === this.o.weekEnd){
 					html.push('</tr>');
